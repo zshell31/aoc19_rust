@@ -33,7 +33,7 @@ const HALT_OP: u32 = 99;
 #[derive(Debug)]
 pub struct Interpreter {
     codes: Vec<u32>,
-    memory: Vec<u32>
+    memory: Vec<u32>,
 }
 
 impl Interpreter {
@@ -41,9 +41,15 @@ impl Interpreter {
         match codes {
             Some(_codes) => {
                 let memory = _codes.clone();
-                Interpreter { codes: _codes, memory: memory }
+                Interpreter {
+                    codes: _codes,
+                    memory: memory,
+                }
+            }
+            None => Interpreter {
+                codes: vec![],
+                memory: vec![],
             },
-            None => Interpreter { codes: vec![], memory: vec![] },
         }
     }
 
@@ -153,14 +159,22 @@ mod tests {
         ($e:expr, $pat:pat) => {
             match $e {
                 Err($pat) => (),
-                Err(ref e) => panic!("assertion failed: `{:?}` does not match `{}`", e, stringify!($pat)),
+                Err(ref e) => panic!(
+                    "assertion failed: `{:?}` does not match `{}`",
+                    e,
+                    stringify!($pat)
+                ),
                 ref ok => panic!("assertion failed: expected error, got `{:?}`", ok),
             }
         };
         ($e:expr, $pat:pat if $cond:expr) => {
             match $e {
                 Err($pat) if $cond => (),
-                Err(ref e) => panic!("assertion failed: `{:?}` does not match `{}`", e, stringify!($pat)),
+                Err(ref e) => panic!(
+                    "assertion failed: `{:?}` does not match `{}`",
+                    e,
+                    stringify!($pat)
+                ),
                 ref ok => panic!("assertion failed: expected error, got `{:?}`", ok),
             }
         };
@@ -182,7 +196,7 @@ mod tests {
 
     #[test]
     fn test_read_from() {
-        let mut i = Interpreter::new(Some(vec![1,2,3,4,5]));
+        let mut i = Interpreter::new(Some(vec![1, 2, 3, 4, 5]));
         assert_eq!(i.read_from(4).unwrap(), 5);
     }
 
@@ -201,7 +215,7 @@ mod tests {
 
     #[test]
     fn test_write_to() {
-        let mut i = Interpreter::new(Some(vec![1,2,3,4,6]));
+        let mut i = Interpreter::new(Some(vec![1, 2, 3, 4, 6]));
         assert_eq!(i.read_from(4).unwrap(), 6);
         assert!(i.write_to(4, 5).is_ok());
         assert_eq!(i.read_from(4).unwrap(), 5);
@@ -252,7 +266,8 @@ mod tests {
 
     #[test]
     fn test_program_1() {
-        let mut i = Interpreter::read_from_string("1,9,10,3,2,3,11,0,99,30,40,50".to_string()).unwrap();
+        let mut i =
+            Interpreter::read_from_string("1,9,10,3,2,3,11,0,99,30,40,50".to_string()).unwrap();
         assert!(i.run_program().is_ok());
         assert_eq!(i.read_from(0).unwrap(), 3500);
     }
